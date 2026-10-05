@@ -1,0 +1,29 @@
+name: Sumar Dos Numeros
+
+on:
+  workflow_dispatch:
+    inputs:
+      num1:
+        description: 'Ingresa el primer número'
+        required: true
+        default: '5'
+      num2:
+        description: 'Ingresa el segundo número'
+        required: true
+        default: '7'
+
+jobs:
+  calcular-suma:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Realizar la suma
+      run: |
+        NUM1=${{ github.event.inputs.num1 }}
+        NUM2=${{ github.event.inputs.num2 }}
+        SUMA=$((NUM1 + NUM2))
+        
+        echo "=============================="
+        echo "Calculando: $NUM1 + $NUM2"
+        echo "El resultado de la suma es: $SUMA"
+        echo "=============================="
