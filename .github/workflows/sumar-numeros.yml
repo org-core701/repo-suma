@@ -1,4 +1,4 @@
-name: Ejecutar Script Python de Suma
+name: Python CI/CD Suma
 
 on:
   push:
@@ -14,11 +14,11 @@ on:
         default: '25'
 
 jobs:
-  ejecutar-script:
+  # Trabajo 1: Realiza las pruebas y ejecuta el script en Python
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Descargar el código del repositorio
+    - name: Descargar el código
       uses: actions/checkout@v4
 
     - name: Configurar Python
@@ -26,5 +26,16 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Ejecutar sumar.py
+    - name: Ejecutar prueba de suma con Python
       run: python sumar.py "${{ github.event.inputs.num1 }}" "${{ github.event.inputs.num2 }}"
+
+  # Trabajo 2: Se conecta a 'test' y genera el enlace azul en la caja gráfica
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: Produccion
+      url: https://org-core701.github.io/repo-suma
+    steps:
+    - name: Confirmar despliegue
+      run: echo "Despliegue completado con éxito."
