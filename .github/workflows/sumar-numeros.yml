@@ -1,23 +1,19 @@
-name: Python CI/CD Suma
+name: Python CI/CD Suma Interactiva
 
 on:
   push:
   workflow_dispatch:
-    inputs:
-      num1:
-        description: 'Ingresa el primer número'
-        required: false
-        default: '15'
-      num2:
-        description: 'Ingresa el segundo número'
-        required: false
-        default: '25'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: Descargar el código
+    - name: Descargar repositorio
       uses: actions/checkout@v4
 
     - name: Configurar Python
@@ -25,15 +21,21 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Ejecutar prueba de suma con Python
-      run: python sumar.py "${{ github.event.inputs.num1 }}" "${{ github.event.inputs.num2 }}"
+    - name: Generar la interfaz web interactiva
+      run: python sumar.py
+
+    - name: Subir sitio como artefacto
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
 
   deploy:
     needs: test
     runs-on: ubuntu-latest
     environment:
-      name: Produccion
-      url: https://github.com/org-core701/repo-suma
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-    - name: Confirmar despliegue
-      run: echo "Despliegue completado con éxito."
+    - name: Publicar en GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
