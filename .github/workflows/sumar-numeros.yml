@@ -1,4 +1,4 @@
-name: Sumar Dos Numeros con Python
+name: Ejecutar Script Python de Suma
 
 on:
   push:
@@ -6,41 +6,25 @@ on:
     inputs:
       num1:
         description: 'Ingresa el primer número'
-        required: true
-        default: '10'
+        required: false
+        default: '15'
       num2:
         description: 'Ingresa el segundo número'
-        required: true
-        default: '20'
+        required: false
+        default: '25'
 
 jobs:
-  calcular-suma-python:
+  ejecutar-script:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Descargar el código del repositorio
+      uses: actions/checkout@v4
+
     - name: Configurar Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
-    - name: Calcular suma y publicar cuadro de resultado
-      run: |
-        python -c "
-        import os
-
-        # Leer variables de la interfaz o asignar valores por defecto si es un push
-        raw_n1 = '${{ github.event.inputs.num1 }}' or '10'
-        raw_n2 = '${{ github.event.inputs.num2 }}' or '20'
-        
-        n1 = int(raw_n1)
-        n2 = int(raw_n2)
-        resultado = n1 + n2
-
-        # Escribir el resultado directamente en la página de resumen de GitHub
-        summary_file = os.environ['GITHUB_STEP_SUMMARY']
-        with open(summary_file, 'a') as f:
-            f.write('## 🧮 Resultado de la Suma\n')
-            f.write(f'* **Primer Número:** {n1}\n')
-            f.write(f'* **Segundo Número:** {n2}\n')
-            f.write(f'* **Suma Total:** `{resultado}`\n')
-        "
+    - name: Ejecutar sumar.py
+      run: python sumar.py "${{ github.event.inputs.num1 }}" "${{ github.event.inputs.num2 }}"
