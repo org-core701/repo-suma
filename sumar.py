@@ -1,6 +1,4 @@
-import os
-
-# Generar un archivo index.html totalmente interactivo
+# Contenido HTML interactivo de la calculadora
 contenido_html = """<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -109,4 +107,3 @@ with open("index.html", "w", encoding="utf-8") as f:
     f.write(contenido_html)
 
 print("Página interactiva index.html generada exitosamente.")
-"""
