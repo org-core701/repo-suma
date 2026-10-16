@@ -1,10 +1,23 @@
-# Contenido HTML interactivo de la calculadora
-contenido_html = """<!DOCTYPE html>
+import django
+from django.conf import settings
+from django.template import Template, Context
+
+# 1. Configurar el motor de plantillas de Django
+if not settings.configured:
+    settings.configure(
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        }]
+    )
+django.setup()
+
+# 2. Plantilla HTML con menú de selección (Select) renderizada por Django
+plantilla_django = """<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Suma - Organización</title>
+    <title>Calculadora Interactiva - Django</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -27,10 +40,11 @@ contenido_html = """<!DOCTYPE html>
             width: 100%;
             max-width: 400px;
         }
-        h1 { color: #58a6ff; margin-bottom: 1.5rem; font-size: 1.8rem; }
+        h1 { color: #58a6ff; margin-bottom: 0.3rem; font-size: 1.8rem; }
+        .sub { color: #8b949e; font-size: 0.85rem; margin-bottom: 1.5rem; }
         .input-group { margin-bottom: 1.2rem; text-align: left; }
         label { display: block; margin-bottom: 0.5rem; color: #8b949e; font-size: 0.9rem; }
-        input {
+        input, select {
             width: 100%;
             padding: 0.75rem;
             border-radius: 6px;
@@ -40,7 +54,7 @@ contenido_html = """<!DOCTYPE html>
             font-size: 1rem;
             outline: none;
         }
-        input:focus { border-color: #58a6ff; }
+        input:focus, select:focus { border-color: #58a6ff; }
         button {
             width: 100%;
             padding: 0.75rem;
@@ -68,19 +82,28 @@ contenido_html = """<!DOCTYPE html>
 </head>
 <body>
     <div class="card">
-        <h1>🧮 Sumar Dos Números</h1>
+        <h1>🧮 Calculadora Web</h1>
+        <p class="sub">Renderizado con el motor de plantillas de Django</p>
         
         <div class="input-group">
+            <label for="operacion">Selecciona la Operación:</label>
+            <select id="operacion">
+                <option value="suma">➕ Sumar</option>
+                <option value="resta">➖ Restar</option>
+            </select>
+        </div>
+
+        <div class="input-group">
             <label for="num1">Primer Número:</label>
-            <input type="number" id="num1" placeholder="Ej. 10" value="10">
+            <input type="number" id="num1" value="{{ val1_defecto }}" placeholder="Ej. 10">
         </div>
         
         <div class="input-group">
             <label for="num2">Segundo Número:</label>
-            <input type="number" id="num2" placeholder="Ej. 20" value="20">
+            <input type="number" id="num2" value="{{ val2_defecto }}" placeholder="Ej. 5">
         </div>
         
-        <button onclick="calcularSuma()">Calcular Suma</button>
+        <button onclick="calcular()">Calcular Resultado</button>
         
         <div id="boxResultado" class="resultado-box">
             <p style="margin: 0 0 0.5rem 0; color: #8b949e; font-size: 0.85rem;">Resultado:</p>
@@ -89,12 +112,22 @@ contenido_html = """<!DOCTYPE html>
     </div>
 
     <script>
-        function calcularSuma() {
-            const val1 = parseFloat(document.getElementById('num1').value) || 0;
-            const val2 = parseFloat(document.getElementById('num2').value) || 0;
-            const suma = val1 + val2;
+        function calcular() {
+            const op = document.getElementById('operacion').value;
+            const v1 = parseFloat(document.getElementById('num1').value) || 0;
+            const v2 = parseFloat(document.getElementById('num2').value) || 0;
+            let res = 0;
+            let simbolo = '+';
+
+            if (op === 'suma') {
+                res = v1 + v2;
+                simbolo = '+';
+            } else if (op === 'resta') {
+                res = v1 - v2;
+                simbolo = '-';
+            }
             
-            document.getElementById('txtResultado').innerText = `${val1} + ${val2} = ${suma}`;
+            document.getElementById('txtResultado').innerText = `${v1} ${simbolo} ${v2} = ${res}`;
             document.getElementById('boxResultado').style.display = 'block';
         }
     </script>
@@ -102,8 +135,13 @@ contenido_html = """<!DOCTYPE html>
 </html>
 """
 
-# Guardar la página web
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(contenido_html)
+# 3. RENDERIZAR con Django pasando valores por defecto
+template = Template(plantilla_django)
+contexto = Context({"val1_defecto": 15, "val2_defecto": 5})
+html_final = template.render(contexto)
 
-print("Página interactiva index.html generada exitosamente.")
+# 4. Guardar como archivo index.html
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_final)
+
+print("Página interactiva index.html renderizada exitosamente con Django.")

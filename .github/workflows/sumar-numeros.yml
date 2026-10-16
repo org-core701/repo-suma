@@ -1,4 +1,4 @@
-name: Python CI/CD Suma Interactiva
+name: CI/CD Calculadora Django con Seleccion
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Descargar repositorio
@@ -21,16 +21,18 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Generar la interfaz web interactiva
-      run: python sumar.py
+    - name: Instalar Django y renderizar index.html
+      run: |
+        pip install django
+        python sumar.py
 
-    - name: Subir sitio como artefacto
+    - name: Subir artefacto para GitHub Pages
       uses: actions/upload-pages-artifact@v3
       with:
         path: '.'
 
   deploy:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
